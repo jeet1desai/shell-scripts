@@ -1,4 +1,4 @@
-# [File Search Script](https://github.com/jeet1desai/shell-scripts/-/blob/master/find-file.sh)
+# [File Search Script](https://github.com/jeet1desai/shell-scripts/blob/main/find-file.sh)
 
 ## Description
 
@@ -14,7 +14,7 @@ This shell script searches for files in a specified directory and its subdirecto
 - `<file_name>`: The file by name to search for.
 
 
-# [File Compare Script](https://github.com/jeet1desai/shell-scripts/-/blob/master/compare-file.sh)
+# [File Compare Script](https://github.com/jeet1desai/shell-scripts/blob/main/compare-file.sh)
 
 ## Description
 
