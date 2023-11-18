@@ -1,0 +1,10 @@
+From:jeetdesai995@gmail.com 
+To:jeetdesai149@gmail.com 
+Subject:Test Email
+
+Hello,
+
+This is a test email sent from the command line using sendmail.
+
+Thank you.
+
