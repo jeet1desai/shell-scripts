@@ -1,67 +1,59 @@
 #!/bin/bash
 
-
 ###########################################################################
 # Name: Jeet Desai
 # Date: 18-11-2023
 #
 # Version: v1
-# Description: Send mail shell script
-#
-# sudo apt install sendmail
-#
-# Open your sendmail.mc file for editing. This file is often located at /etc/mail/sendmail.mc. Add the following lines to the file: 
-# FEATURE(`authinfo', `hash -o /etc/mail/authinfo.db')dnl
-# define(`SMART_HOST', `smtp.gmail.com')dnl
-# define(`RELAY_MAILER_ARGS', `TCP $h 587')dnl
-#
-# Create a file called /etc/mail/authinfo and add the following line: sudo vim /etc/mail/authinfo
-# AuthInfo:smtp.gmail.com "U:your_username@gmail.com" "I:your_username@gmail.com" "P:your_app_password" "M:PLAIN"
-# 
-# Run the following commands to generate the authinfo.db file:
-# sudo makemap hash /etc/mail/authinfo < /etc/mail/authinfo
-# sudo sh -c 'm4 /etc/mail/sendmail.mc > /etc/mail/sendmail.cf'
-# sudo mkdir -p /etc/mail/auth
-# sudo chmod 700 /etc/mail/auth
-#
-# Restart the sendmail service with sudo to apply the changes:
-# sudo service sendmail restart   # On SysV systems
-# sudo systemctl restart sendmail # On systemd systems
-#
+# Description: Send mail shell script using curl
 ###########################################################################
 
 # set -x # Debug mode
 # set -e 
 
-# sender=""
-# receiver=""
+sender="email@example.com"
+gapp="google app password"
 
-# read -p "Please enter subject: " subject
-# read -p "Please enter body: " body
+read -p "Please enter recipient email: " receiver
 
-email_file="/home/jeet/Documents/shell-scripts/email.txt"
-cat $email_file
+read -p "Please enter subject: " sub
+
+echo "Please enter body: " 
+cat > bodyfile.txt 
+body=$(cat bodyfile.txt)
 
 read -p "Please attach file name (or leave balck if none): " file
 
-if [ -f "$file" -a -s "$file" ]
-then
-	echo "File Exist"
-	#Mime=$(file --mime-type "$file" | sed 's/.*: //')
-	#echo "$Mime"
-	#echo "$body" | mail -s "$subject" -a "Content-Type:$Mime" -A "$file" "$receiver"
-	sudo sendmail -A "$file" -i -t < "$email_file" 2> ./error.log
+if [ -z "$file" ] 
+then 
+    curl -s --url 'smtps://smtp.gmail.com:465' --ssl-reqd \
+    	    --mail-from "$sender" \
+            --mail-rcpt "$receiver" \
+            --user "$sender:$gapp" \
+            -T - << EOF
+From: $sender
+To: $receiver
+Subject: $sub
+$body 
+EOF
+
 else
-	echo "File not exist"
-	sudo sendmail -i -t < "$email_file" 2> ./error.log
-	#echo "$body" | mail -s "$subject" "$receiver"
+    MIMEType=`file --mime-type "$file" | sed 's/.*: //'`
+    curl -s --url 'smtps://smtp.gmail.com:465' --ssl-reqd \
+    --mail-from "$sender" \
+    --mail-rcpt "$receiver" \
+    --user "$sender:$gapp" \
+    -H "Subject: $sub" -H "From: $sender" -H "To: $receiver" -F \
+    '=(;type=multipart/mixed' -F "=$body;type=text/plain" -F \
+    "file=@$file;type=$MIMEType;encoder=base64" -F '=)'
+     
 fi
 
 if [ $? -eq 0 ]
-then 
-	rm ./error.log
+then
+	rm bodyfile.txt
 	echo "Email sent successfully"
 else
-	echo "Something went wrong while sending email, Please check error.log file"
+	echo "Something went wrong while sending email."
 fi
 

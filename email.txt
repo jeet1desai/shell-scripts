@@ -3,8 +3,6 @@ To:
 Subject:Test Email
 
 Hello,
-
 This is a test email sent from the command line using sendmail.
-
 Thank you.
 
